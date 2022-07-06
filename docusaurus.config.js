@@ -100,6 +100,29 @@ const config = {
       prism: {
         theme: lightCodeTheme,
         darkTheme: darkCodeTheme,
+        magicComments: [
+          {
+            className: "theme-code-block-highlighted-line",
+            line: "highlight-next-line",
+            block: { start: "highlight-start", end: "highlight-end" },
+          },
+          {
+            className: "code-block-success-line",
+            line: "highlight-next-line-success",
+            block: {
+              start: "highlight-start-success",
+              end: "highlight-end-success",
+            },
+          },
+          {
+            className: "code-block-danger-line",
+            line: "highlight-next-line-danger",
+            block: {
+              start: "highlight-start-danger",
+              end: "highlight-end-danger",
+            },
+          },
+        ],
       },
     }),
 };
