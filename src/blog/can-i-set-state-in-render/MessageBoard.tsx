@@ -48,6 +48,7 @@ const users: User[] = [
 
 export default function MessageBoard() {
   const [selectedUserId, setSelectedUserId] = useState<number>(1);
+  const selectedUser = users.find((u) => u.id === selectedUserId);
 
   return (
     <div style={{ display: "flex", flexDirection: "row" }}>
@@ -62,7 +63,8 @@ export default function MessageBoard() {
         ))}
       </div>
       <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
-        <div style={{ flex: 1, backgroundColor: "#EEEEEE" }}></div>
+        <div style={{ textAlign: "center" }}>{selectedUser.name}</div>
+        <div style={{ flex: 1, backgroundColor: "#EEEEEE" }} />
         <MessageComposer userId={selectedUserId} />
       </div>
     </div>
