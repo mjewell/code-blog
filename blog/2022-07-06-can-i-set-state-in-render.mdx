@@ -1,0 +1,75 @@
+---
+slug: can-i-set-state-in-render
+title: Can I Set State in Render?
+authors: [mjewell]
+tags: [react, hooks, lifecycle]
+---
+
+import CodeBlock from "@theme/CodeBlock";
+
+**TL;DR - Yes, as long as it's conditional to prevent an infinite loop.**
+
+You've probably seen this error before.
+
+```bash
+# highlight-next-line-danger
+react-dom.development.js?ac89:14997 Uncaught Error: Too many re-renders.
+# highlight-next-line-danger
+React limits the number of renders to prevent an infinite loop.
+```
+
+A pretty common scenario where you might have encountered this is when you don't wrap the `onClick` callback with a function, causing it to be triggered on every render.
+
+import InfiniteLoopHandlerSource from "!!raw-loader!../src/blog/can-i-set-state-in-render/InfiniteLoopHandler";
+
+<CodeBlock language="tsx">{InfiniteLoopHandlerSource}</CodeBlock>
+
+The fix is simple, just make the `onClick` a callback.
+
+```jsx
+onClick={() => setX((x) => x + 1)}
+```
+
+When I encountered this issue, I assumed that meant I should **never** directly call `setState` in the render method, but it turns out there is a valid use case - **adjusting state when props change**. Let's say you're making a messaging app, and you have an input field for writing your messages. When you switch which user you're messaging, we want to reset the input field back to it's original state. A common pattern I've seen for this is to use a useEffect, like so.
+
+import MessageComposerUseEffectSource from "!!raw-loader!../src/blog/can-i-set-state-in-render/MessageComposerUseEffect";
+
+<CodeBlock language="tsx">{MessageComposerUseEffectSource}</CodeBlock>
+
+But according to the [new react docs](https://beta.reactjs.org/learn/you-might-not-need-an-effect#adjusting-some-state-when-a-prop-changes), this is not a good use case for `useEffect`. In this case, when the userId changes we will render the component with the new userId but the old message value, and then restart the whole process with the updated empty message. This can cause flicker and also results in unnecessary time spent making DOM changes that are immediately stale. The recommended approach for this is to set state inside the render, but make it conditional so it doesn't result in an infinite render loop.
+
+```tsx
+// highlight-start-danger
+useEffect(() => {
+  setMessage("");
+}, [userId]);
+// highlight-end-danger
+
+// highlight-start-success
+const [prevUserId, setPrevUserId] = useState(userId);
+if (userId !== prevUserId) {
+  setPrevUserId(userId);
+  setMessage("");
+}
+// highlight-end-success
+```
+
+import MessageBoard from "../src/blog/can-i-set-state-in-render/MessageBoard";
+
+<MessageBoard />
+
+---
+
+This is more performant than `useEffect` because react can detect that it needs to re-render before it has rendered the children or mutated the DOM, resulting in only a single DOM update.
+
+So in the end, yes, you can set state in the render function, and it is actually recommended in some cases, as long as it's conditional to prevent infinite loops.
+
+:::tip
+
+Alternatively, if you want to reset the entire state of the component, we could use the userId as a key, causing the component to be completely recreated every time the userId changes. In many cases this is probably what you want to do.
+
+```tsx
+<MessageComposer key={userId} userId={userId} />
+```
+
+:::

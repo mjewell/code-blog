@@ -122,6 +122,14 @@ const config = {
               end: "highlight-end-danger",
             },
           },
+          {
+            line: "@ts-expect-error no-highlight",
+            className: "code-block-ts-error-line",
+          },
+          {
+            className: "code-block-ts-error-danger-line",
+            line: "@ts-expect-error highlight",
+          },
         ],
       },
     }),
