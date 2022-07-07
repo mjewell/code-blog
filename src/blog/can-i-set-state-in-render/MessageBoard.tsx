@@ -47,7 +47,7 @@ const users: User[] = [
 ];
 
 export default function MessageBoard() {
-  const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
+  const [selectedUserId, setSelectedUserId] = useState<number>(1);
 
   return (
     <div style={{ display: "flex", flexDirection: "row" }}>
